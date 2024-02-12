@@ -1,0 +1,46 @@
+﻿<Window x:Class="diarioLibros_Version1.VentanaConfiguracion"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:diarioLibros_Version1"
+        mc:Ignorable="d"
+        Title="VentanaConfiguracion" Height="130" Width="240">
+    <Grid Background="#FFEAAC78">
+        <!-- Definir filas para dividir la ventana en tres partes -->
+        <Grid.RowDefinitions>
+            <RowDefinition Height="1*"/>
+            <!-- Mitad superior -->
+            <RowDefinition Height="1*"/>
+            <!-- Mitad inferior dividida en dos partes -->
+        </Grid.RowDefinitions>
+
+        <!-- Mitad superior -->
+        <Border Grid.Row="0" >
+            <!-- Contenido de la franja superior -->
+            <TextBox Margin="10"></TextBox>
+        </Border>
+
+        <!-- Mitad inferior dividida en dos columnas -->
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="1*"/>
+                <!-- Mitad inferior izquierda -->
+                <ColumnDefinition Width="1*"/>
+                <!-- Mitad inferior derecha -->
+            </Grid.ColumnDefinitions>
+
+            <!-- Mitad inferior izquierda -->
+            <Border Grid.Column="0">
+                <!-- Contenido de la mitad inferior izquierda -->
+                <Button Content="Salir" Margin="10" Background="LightGray" Click="Button_Click"/>
+            </Border>
+
+            <!-- Mitad inferior derecha -->
+            <Border Grid.Column="1">
+                <!-- Contenido de la mitad inferior derecha -->
+                <Button Content="Guardar" Margin="10" Background="LightGray"/>
+            </Border>
+        </Grid>
+    </Grid>
+</Window>
