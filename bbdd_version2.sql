@@ -534,7 +534,48 @@ DELIMITER ;
 -- SELECT @resultado;
 
 
+-- -----------------------------------------------------------PROCEDIMIENTO PARA SACAR la ficha del libro escogido ----------------------------------------------------------------------------------
 
+DROP PROCEDURE IF EXISTS fichaDelLibro;
+DELIMITER //
+CREATE PROCEDURE fichaDelLibro(
+    IN _titulo VARCHAR(255),
+    IN _autor VARCHAR(255),
+    IN _portada VARCHAR(255),
+    OUT resul INT,
+    OUT stringTotal TEXT
+)
+BEGIN
+    DECLARE libroExistente INT DEFAULT 0;
+
+    SET resul = -99;
+    SET stringTotal = "";
+
+    SELECT COUNT(*) INTO libroExistente
+    FROM libros
+    JOIN autores ON libros.autor_id = autores.id_autor
+    WHERE autores.nombre LIKE CONCAT('%', _autor, '%')
+      AND libros.titulo LIKE CONCAT('%', _titulo, '%')
+      AND libros.portada LIKE CONCAT('%', _portada, '%');
+
+    IF libroExistente = 0 THEN
+        -- El libro no existe
+        SET resul = -1;
+    ELSE
+        -- El libro existe, ahora obtener la información del libro
+        SELECT CONCAT(libros.titulo, ';', libros.portada, ';', autores.nombre, ';', libros.sinopsis) INTO stringTotal
+        FROM libros
+        JOIN autores ON libros.autor_id = autores.id_autor
+        WHERE autores.nombre LIKE CONCAT('%', _autor, '%')
+          AND libros.titulo LIKE CONCAT('%', _titulo, '%')
+          AND libros.portada LIKE CONCAT('%', _portada, '%');
+    END IF;
+
+END //
+DELIMITER ;
+
+-- CALL fichaDelLibro( "Harry","Row", "Proyecto Final\mark I\imagenes\HPCamara", @resultado, @ff);
+-- SELECT @resultado, @ff;
 
 
 
