@@ -134,20 +134,64 @@ CREATE PROCEDURE Login(IN _username varchar(16),
 						IN _password varchar(40),
 						OUT _res INT)
 BEGIN
+-- Declaración de variables
     DECLARE res_login varchar(16);
+    DECLARE tries int;
+	DECLARE horaDeBann timestamp;
+    -- errores controlados y inicialización de variables
     SET _res = -99; -- ERROR NO CONTROLADO
+    SET tries = 0;
     SET res_login = NULL;
-	
-       SELECT usuario
-       FROM usuarios
-       WHERE usuario LIKE _username and pass LIKE _password
-       INTO res_login;
+
+-- meter datos de la base de datos en las variables temporales
+		Select intentos_fallidos
+        from usuarios
+        WHERE usuario LIKE _username
+        into tries ;
        
-       IF(res_login IS NULL) THEN
-			SET _res = -1; -- Usuario y contraseña no coinciden
+        Select count(*)
+        from usuarios
+        where usuario Like _username and pass like _password
+        into res_login;
+        
+        select ultimo_intento
+        from usuarios
+        where usuario like _username
+        into horaDeBann; 
+        
+	
+    if(sysdate() > horaDeBann) then -- si la hora actual es mayor que el ultimo intento entra 
+		
+       IF(tries = 3) then
+       -- aquí agota el ultimo intento de hacer login y le meto el bann 
+			update usuarios 
+			set ultimo_intento = date_add(SYSDATE(), INTERVAL 30 SECOND)
+			where usuario like _username;
+			set _res = -2; -- mensaje de que se va banneado
 		ELSE
-			SET _res = 0; -- Usuario y contraseña coinciden
+			IF(res_login like 0 and horaDeBann < sysdate()) THEN
+				SET _res = -1; -- Usuario y contraseña no coinciden
+				Update usuarios
+				Set intentos_fallidos = intentos_fallidos +1
+                where usuario like _username; 
+			ELSE
+				SET _res = 0; -- Usuario y contraseña coinciden
+				Update usuarios
+				Set intentos_fallidos = 0
+                where usuario like _username;
+			END IF;
 		END IF;
+        
+	-- aqui es cuando compruebo que ya pasaron los 30 seg y le reseteo los intentos fallidos
+        if(tries = 3 and sysdate() >= horaDeBann) then
+				Update usuarios
+				Set intentos_fallidos = 0
+                where usuario like _username;
+        end if; 
+	else 
+		set _res = -3; -- intenta hacer login mientras está banneado
+	 end if; 
+   
 END//
 DELIMITER ;
 
