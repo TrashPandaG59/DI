@@ -297,61 +297,43 @@ END //
 DELIMITER ;
 
 
--- --------------------------------------------------------------------------PROCEDIMIENTO PARA FILTRAR LIBROS POR EL GÉNERO -------------------------------------------------------------------------------------
-
-drop procedure if exists filtrarPorGenero;
+-- --------------------------------------------------------------------------PROCEDIMIENTO PARA FILTRAR LIBROS POR TODO (TÍTULO, AUTOR Y GENERO) -------------------------------------------------------------------------------------
+drop procedure if exists filtrarPorTodo;
 DELIMITER //
-CREATE PROCEDURE filtrarPorGenero(IN _gen VARCHAR(255), OUT _result INT)
-BEGIN
-    DECLARE genreExists INT DEFAULT 0;
-
-    -- Verificar si el género existe en la lista ENUM
-    SELECT COUNT(*) INTO genreExists
-    FROM information_schema.COLUMNS
-    WHERE TABLE_NAME = 'libros' AND COLUMN_NAME = 'genero'
-          AND COLUMN_TYPE LIKE CONCAT('%', _gen, '%');
-
-    IF genreExists = 0 THEN
-        -- El género no existe en la lista ENUM
-        SET _result = -1;
-    ELSE
-        -- El género existe, ahora verificamos si hay libros de ese género
-        SELECT COUNT(*) INTO _result
-        FROM libros
-        WHERE genero = _gen;
-
-        IF _result = 0 THEN
-            -- No hay libros de ese género
-            SET _result = -2;
-        END IF;
-    END IF;
-END//
-DELIMITER ; 
-
-
--- --------------------------------------------------------------------------PROCEDIMIENTO PARA FILTRAR LIBROS POR TÍTULO -------------------------------------------------------------------------------------
-drop procedure if exists filtrarPorTitulo;
-DELIMITER //
-CREATE PROCEDURE filtrarPorTitulo(IN _titulo VARCHAR(255), OUT _result INT)
+CREATE PROCEDURE filtrarPorTodo(IN _cadenaIntroducida VARCHAR(255), 
+								OUT _result INT)
 BEGIN
     DECLARE titleExists INT DEFAULT 0;
-
-    -- Verificar si el título existe en la tabla de libros
-    SELECT COUNT(*) INTO titleExists
+    
+    -- Verificar si el título existe en la tabla de libros  
+     SELECT COUNT(*) INTO titleExists
     FROM libros
-    WHERE titulo = _titulo;
+    JOIN autores ON libros.autor_id = autores.id_autor
+    WHERE autores.nombre LIKE CONCAT('%', _cadenaIntroducida, '%')
+      OR libros.titulo LIKE CONCAT('%', _cadenaIntroducida, '%')
+      OR libros.genero LIKE CONCAT('%', _cadenaIntroducida, '%');
+    
 
     IF titleExists = 0 THEN
-        -- El título no existe
-        SET _result = -1;
+        -- No hay resultados
+        SET _result = -1;    
+    
     ELSE
         -- El título existe, ahora obtener la información del libro
-        SELECT id_libro
-        FROM libros
-        WHERE titulo = _titulo;
+        SELECT libros.titulo, libros.portada, autores.nombre
+        FROM libros join autores 
+        on libros.autor_id = autores.id_autor
+        WHERE autores.nombre LIKE CONCAT('%', _cadenaIntroducida, '%')
+      OR libros.titulo LIKE CONCAT('%', _cadenaIntroducida, '%')
+      OR libros.genero LIKE CONCAT('%', _cadenaIntroducida, '%');
     END IF;
 END//
 DELIMITER ;
+
+ CALL filtrarPorTodo("Liz",@resultado);
+ SELECT @resultado;
+
+
 -- ------------------------------------------------------PROCEDIMIENTO PARA CALCURLAR CUÁNTOS LIBROS ESTÁ LEYENDO EL USUARIO, MÁXIMO 4 ---------------------------------------------------------------------
 DROP PROCEDURE IF EXISTS cantidadLibrosLeyendo;
 DELIMITER //
