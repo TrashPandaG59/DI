@@ -246,7 +246,7 @@ BEGIN
 END//
 DELIMITER ;
 
--- --------Hay que comprobar si funiona-------------------------------------PROCEDIMIENTO PARA actualizar el estado libros del usuario ---------------------------------------------------------------------------------------------
+-- --------------------------------------------------------------------------------PROCEDIMIENTO PARA actualizar el estado libros del usuario -----------------------------------------------------------------------------
 DROP PROCEDURE IF EXISTS nuevo_libro_usuario;
 DELIMITER //
 CREATE PROCEDURE nuevo_libro_usuario(
