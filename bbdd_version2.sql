@@ -600,33 +600,19 @@ BEGIN
 END //
 DELIMITER ;
 
--- CALL fichaDelLibro( "Harry","Row", "Proyecto Final\mark I\imagenes\HPCamara", @resultado, @ff);
--- SELECT @resultado, @ff;
+-- ---------------------------------------------------------------------------------VISTAS---------------------------------------------------------------------------------------------------------------------------
+Create view autoresDeLibros as 
+Select a.nombre, a.siglo, l.titulo, l.genero 
+from autores a join libros l
+on a.id_autor = l.autor_id;
 
 
+CREATE VIEW vista_libros_con_comentarios AS
+SELECT l.id_libro, l.titulo, COUNT(ulc.id_comentario) AS num_comentarios
+FROM libros l
+LEFT JOIN usuarios_libros_comentarios ulc ON l.id_libro = ulc.id_libro
+GROUP BY l.id_libro, l.titulo;
 
-select * from usuarios;
-
- CALL bloqueo_de_cuenta( "jorgito","11",@resultado);
- SELECT @resultado;
-
-
-CALL cogerFotoPerfil( "jorgito",@resultado);
- SELECT @resultado;
-
-
--- Call Login('jorgito','1234',@resul);
--- SELECT @resul;
-
-
-Select * from Usuarios;
-Select * from autores;
-select * from Libros;
-select * from usuarios_libros;
-
--- update usuarios 
--- set intentos_fallidos = 0 
--- where usuarios.id_usuario = 1
 
 
 
