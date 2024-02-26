@@ -71,12 +71,12 @@ CREATE TABLE IF NOT EXISTS usuarios_libros (
 );
 
 
-CREATE TABLE IF NOT EXISTS usuarios_libros_comentarios (
-    id_comentario INT NOT NULL AUTO_INCREMENT,
+CREATE TABLE IF NOT EXISTS usuarios_libros_puntuacion (
+    id_puntuacion INT NOT NULL AUTO_INCREMENT,
     id_libro INT NOT NULL,
     id_usuario INT NOT NULL,
-    comentario text,
-    PRIMARY KEY (id_comentario),
+    puntuacion int not null,
+    PRIMARY KEY (id_puntuacion),
     FOREIGN KEY (id_libro) REFERENCES libros (id_libro),
     FOREIGN KEY (id_usuario) REFERENCES usuarios (id_usuario)
 );
@@ -313,9 +313,6 @@ END//
 DELIMITER ;
 
 
-select * from libros;
-select * from usuarios_libros;
-
 
 
 
@@ -328,6 +325,8 @@ CREATE PROCEDURE cogerFotoPerfil(
     IN _nomusuario VARCHAR(16),
     OUT resul varchar(255)
 )
+
+
 BEGIN	
     set resul = 'C:\\Users\\lucia.jaime.martin_a\\Desktop\\Asignaturas\\DI\\Proyecto Final\\imagenes\\foto_perfil_defecto.jpg';
     
@@ -374,8 +373,7 @@ BEGIN
 END//
 DELIMITER ;
 
- CALL filtrarPorTodo("Liz",@resultado);
- SELECT @resultado;
+
 
 
 -- ------------------------------------------------------PROCEDIMIENTO PARA CALCURLAR CUÁNTOS LIBROS ESTÁ LEYENDO EL USUARIO, MÁXIMO 4 ---------------------------------------------------------------------
@@ -599,20 +597,18 @@ BEGIN
 
 END //
 DELIMITER ;
-
--- ---------------------------------------------------------------------------------VISTAS---------------------------------------------------------------------------------------------------------------------------
+-- ---------------------------------------- Vistas-------------------------------------------------------------------------------------------------------------------------------
 Create view autoresDeLibros as 
 Select a.nombre, a.siglo, l.titulo, l.genero 
 from autores a join libros l
 on a.id_autor = l.autor_id;
 
-
-CREATE VIEW vista_libros_con_comentarios AS
-SELECT l.id_libro, l.titulo, COUNT(ulc.id_comentario) AS num_comentarios
+-- Crear la vista
+CREATE VIEW puntuacionMediaLibros AS
+SELECT l.id_libro, l.titulo, AVG(ulc.puntuacion) AS mediaDePuntos
 FROM libros l
-LEFT JOIN usuarios_libros_comentarios ulc ON l.id_libro = ulc.id_libro
+LEFT JOIN usuarios_libros_puntuacion ulc ON l.id_libro = ulc.id_libro
 GROUP BY l.id_libro, l.titulo;
-
 
 
 
