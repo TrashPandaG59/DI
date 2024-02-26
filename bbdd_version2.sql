@@ -253,24 +253,23 @@ CREATE PROCEDURE nuevo_libro_usuario(in _idLibro int,
                         in _id_usuario int,
                         in _estado enum('Pendiente','Leyendo','Terminado'))
 BEGIN
-	Declare existente int;
-    set existente =  0;
-    
-    select id_usuarios_libros into existente
-    From usuarios_libros
-    where id_libro = _idLibro and id_usuario = _id_usuario;
-    
-    if existente is null then
-		insert into usuarios_libros (id_libro,id_usuario,estado)
-		values(_idLibro,_id_usuario,_estado);
-        
-	else
-		UPDATE estado
-		SET eatado = _estado
-		where id_libro = _idLibro and id_usuario = _id_usuario;
-        
-    end if;
-    
+	DECLARE filas_afectadas INT;
+
+    -- Verificar si el registro ya existe
+    SELECT COUNT(*) INTO filas_afectadas
+    FROM usuarios_libros
+    WHERE id_libro = _idLibro AND id_usuario = _id_usuario;
+
+    IF filas_afectadas = 0 THEN
+        -- Si no existe, insertar un nuevo registro con estado "Pendiente"
+        INSERT INTO usuarios_libros (id_libro, id_usuario, estado)
+        VALUES (_idLibro, _id_usuario, 'Pendiente');
+    ELSE
+        -- Si existe, actualizar el estado según la preferencia del usuario
+        UPDATE usuarios_libros
+        SET estado = _estado
+        WHERE id_libro = _idLibro AND id_usuario = _id_usuario;
+    END IF;
 END//
 DELIMITER ;
 
