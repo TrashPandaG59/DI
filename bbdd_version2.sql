@@ -247,28 +247,60 @@ END//
 DELIMITER ;
 
 -- --------Hay que comprobar si funiona-------------------------------------PROCEDIMIENTO PARA actualizar el estado libros del usuario ---------------------------------------------------------------------------------------------
-Drop PROCEDURE if EXISTS nuevo_libro_usuario;
+DROP PROCEDURE IF EXISTS nuevo_libro_usuario;
 DELIMITER //
-CREATE PROCEDURE nuevo_libro_usuario(in _idLibro int,
-                        in _id_usuario int,
-                        in _estado enum('Pendiente','Leyendo','Terminado'))
+CREATE PROCEDURE nuevo_libro_usuario(
+    IN _titulo VARCHAR(255),
+    IN _autor VARCHAR(255),
+    IN _usuario VARCHAR(255),
+    IN _estado ENUM('Pendiente', 'Leyendo', 'Terminado')
+)
 BEGIN
-	DECLARE filas_afectadas INT;
+    DECLARE filas_afectadas INT;
+    DECLARE _idUsuario INT;
+    DECLARE _idLibro INT;
 
-    -- Verificar si el registro ya existe
-    SELECT COUNT(*) INTO filas_afectadas
-    FROM usuarios_libros
-    WHERE id_libro = _idLibro AND id_usuario = _id_usuario;
+    -- Obtener el id del usuario
+    SELECT id_usuario INTO _idUsuario
+    FROM usuarios
+    WHERE usuario = _usuario;
 
-    IF filas_afectadas = 0 THEN
-        -- Si no existe, insertar un nuevo registro con estado "Pendiente"
-        INSERT INTO usuarios_libros (id_libro, id_usuario, estado)
-        VALUES (_idLibro, _id_usuario, 'Pendiente');
+    -- Verificar si el usuario existe
+    IF _idUsuario IS NOT NULL THEN
+        -- Obtener el id del libro
+        SELECT l.id_libro INTO _idLibro
+        FROM libros l
+        JOIN autores a ON l.autor_id = a.id_autor
+        WHERE l.titulo LIKE CONCAT('%', _titulo, '%') AND a.nombre LIKE CONCAT('%', _autor, '%');
+
+        -- Verificar si el libro existe
+        IF _idLibro IS NOT NULL THEN
+            -- Verificar si el registro ya existe
+            SELECT COUNT(*) INTO filas_afectadas
+            FROM usuarios_libros
+            WHERE id_libro = _idLibro AND id_usuario = _idUsuario;
+
+            IF filas_afectadas = 0 THEN
+                -- Si no existe, insertar un nuevo registro con estado "Pendiente"
+                INSERT INTO usuarios_libros (id_libro, id_usuario, estado)
+                VALUES (_idLibro, _idUsuario, 'Pendiente');
+            ELSE
+                -- Si existe, actualizar el estado según la preferencia del usuario
+                UPDATE usuarios_libros
+                SET estado = _estado
+                WHERE id_libro = _idLibro AND id_usuario = _idUsuario;
+            END IF;
+        ELSE
+            -- El libro no existe, manejar según tus necesidades
+            -- Puedes lanzar una excepción, registrar un mensaje, etc.
+            -- En este ejemplo, simplemente se imprime un mensaje
+            SELECT 'El libro no existe' AS mensaje;
+        END IF;
     ELSE
-        -- Si existe, actualizar el estado según la preferencia del usuario
-        UPDATE usuarios_libros
-        SET estado = _estado
-        WHERE id_libro = _idLibro AND id_usuario = _id_usuario;
+        -- El usuario no existe, manejar según tus necesidades
+        -- Puedes lanzar una excepción, registrar un mensaje, etc.
+        -- En este ejemplo, simplemente se imprime un mensaje
+        SELECT 'El usuario no existe' AS mensaje;
     END IF;
 END//
 DELIMITER ;
