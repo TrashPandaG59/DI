@@ -597,6 +597,25 @@ BEGIN
 
 END //
 DELIMITER ;
+
+Drop Procedure if exists LibrosUsuario; 
+Delimiter // 
+Create procedure LibrosUsuarios(in _user varchar(50))
+BEGIN 
+	Declare _iduser int; 
+
+    select id_usuario
+    from usuarios
+    where _user = usuario
+    into _ideuser; 
+    
+    Select l.titulo,a.nombre, l.portada 
+    from usuarios_libros ul join libros l on ul.id_libro =l.id_libro
+    join autores a on l.autor_id = a.id_autor 
+    where ul.id_usuario = _iduser; 
+    
+END// 
+DELIMITER ; 
 -- ---------------------------------------- Vistas-------------------------------------------------------------------------------------------------------------------------------
 Create view autoresDeLibros as 
 Select a.nombre, a.siglo, l.titulo, l.genero 
