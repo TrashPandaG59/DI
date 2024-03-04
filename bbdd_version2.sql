@@ -560,6 +560,31 @@ BEGIN
     
 END// 
 DELIMITER ; 
+
+Drop procedure if exists configuracion; 
+Delimiter $$ 
+Create procedure configuracion(in _kcambiar text, in _aloquecambiar varchar(255), in _user varchar(255) ,out _res int)
+Begin
+	declare iduser int;
+ select id_usuario
+		from usuarios
+		where usuario = _user
+		into iduser;  
+	if (_kcambiar = "nomUser") then
+		update usuarios set usuario = _aloquecambiar where id_usuario = iduser;
+        set _res = 0;
+	elseif (_kcambiar = "pass") then 
+		update usuarios set pass = _aloquecambiar where id_usuario = iduser;
+        set _res = 0;
+	elseif (_kcambiar = "correo") then
+		update usuarios set email = _aloquecambiar where id_usuario = iduser;
+        set _res = 0;
+	else 
+		set _res = -1; -- el kcambiar hay algo que no va
+    end if; 
+
+end $$
+delimiter ; 
 -- ---------------------------------------- Vistas-------------------------------------------------------------------------------------------------------------------------------
 Create view autoresDeLibros as 
 Select a.nombre, a.siglo, l.titulo, l.genero 
