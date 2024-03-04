@@ -51,8 +51,9 @@ CREATE TABLE IF NOT EXISTS libros (
     autor_id int not null,
     genero ENUM('Ficción', 'No Ficción', 'Misterio', 'Romance', 'Aventura', 'Ciencia Ficción', 'Fantasía', 'Terror', 'Suspenso', 'Drama', 'Poesía', 'Biografía', 'Ensayo', 'Clásicos', 'Historia', 'Religión', 'Ciencia', 'Filosofía', 'Política', 'Autoayuda', 'Literatura Infantil', 'Literatura Juvenil') NOT NULL,
     puntuacion INT,
-    publicacion year,
+    publicacion int,
     portada varchar(255),
+    pdf varchar(255),
     editorial INT,
     PRIMARY KEY (id_libro),
     FOREIGN KEY (autor_id) REFERENCES autores(id_autor),
@@ -208,6 +209,7 @@ CREATE PROCEDURE insert_libro(IN _titulo varchar(255),
                         'Clásicos', 'Historia', 'Religión', 'Ciencia', 'Filosofía', 'Política', 'Autoayuda', 'Literatura Infantil', 'Literatura Juvenil'),
                         in _anopublic int,
                         in _portada varchar(255),
+                        in _pdf varchar(255),
 						OUT _res varchar(255))
 BEGIN
 	DECLARE id_del_autor INT;
@@ -237,8 +239,8 @@ BEGIN
     
     ELSE
         -- Insertar el libro
-        INSERT INTO libros (titulo, sinopsis, autor_id, genero, publicacion, portada)
-        VALUES (_titulo, _sinopsis, id_del_autor, _genero, _anopublic, _portada);
+        INSERT INTO libros (titulo, sinopsis, autor_id, genero, publicacion, portada, pdf)
+        VALUES (_titulo, _sinopsis, id_del_autor, _genero, _anopublic, _portada, _pdf);
         
         SET _res = 'Libro insertado exitosamente';
     END IF;
