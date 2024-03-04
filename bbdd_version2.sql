@@ -553,7 +553,7 @@ BEGIN
     select id_usuario
     from usuarios
     where _user = usuario
-    into _ideuser; 
+    into _iduser; 
     
     Select l.titulo,a.nombre, l.portada 
     from usuarios_libros ul join libros l on ul.id_libro =l.id_libro
@@ -587,6 +587,33 @@ Begin
 
 end $$
 delimiter ; 
+
+
+drop procedure if exists biblioteca
+delimiter $$
+create procedure biblioteca(in _user varchar(255))
+Begin
+	Declare _iduser int; 
+    Declare _idlibro int; 
+    
+	select id_usuario
+    from usuarios
+    where usuario = _user
+    into _iduser; 
+    
+ 
+	SELECT l.titulo AS Titulo,
+       a.nombre AS Autor,
+       l.portada AS Portada,
+       ul.estado AS Estado
+FROM libros l
+INNER JOIN autores a ON l.autor_id = a.id_autor
+INNER JOIN usuarios_libros ul ON l.id_libro = ul.id_libro
+where ul.id_usuario = _iduser;
+
+-- Titulo, autor portada y estado
+end$$
+delimiter ;
 -- ---------------------------------------- Vistas-------------------------------------------------------------------------------------------------------------------------------
 Create view autoresDeLibros as 
 Select a.nombre, a.siglo, l.titulo, l.genero 
