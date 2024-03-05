@@ -96,6 +96,7 @@ CREATE PROCEDURE InsertarUsuario(
     IN usu VARCHAR(255),
     IN em VARCHAR(255),
     IN pass VARCHAR(30),
+    in librosleidos int,
     OUT resul INT
 )
 BEGIN
@@ -119,7 +120,7 @@ BEGIN
         SET resul = -3; -- Email ya existe
     ELSE 
         INSERT INTO usuarios (nombre, apellido, usuario, email, pass, libros_leidos,fecha_alta)
-        VALUES (nom, apell, usu, em, pass, 0 ,fecha);
+        VALUES (nom, apell, usu, em, pass, librosleidos ,fecha);
         set resul = 0;
     END IF;
 END //
